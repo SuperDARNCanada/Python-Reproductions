@@ -64,7 +64,7 @@ for yr in range(2007,2008):
 				num_radars_north[day-1] += 1
 				with open('file_for_north', 'a') as f:
 					f.write('{}\n'.format(file))
-					f.write('num_radars_north: {}\t{}\n'.format(num_radars_north))
+					f.write('num_radars_north: {}\n'.format(num_radars_north))
 				lock.release()
 
 				list_hrs_n = []
@@ -114,7 +114,7 @@ for yr in range(2007,2008):
 				num_radars_south[day-1] += 1
 				with open('file_for_south', 'a') as f:
 					f.write('{}\n'.format(file))
-					f.write('num_radars_south: {}\n'.format(num))
+					f.write('num_radars_south: {}\n'.format(num_radars_south))
 				lock.release()
 
 				list_hrs_s = []
