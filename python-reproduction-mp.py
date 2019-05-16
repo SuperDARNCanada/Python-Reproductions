@@ -12,15 +12,14 @@ north_st_ids = [209, 208, 33, 207, 206, 66, 205, 204, 1, 10, 40, 41, 64, 3, 16, 
 south_st_ids = [24, 96, 21, 4, 15, 20, 11, 22, 13, 12, 14, 18, 19]
 
 for yr in range(2007,2008):
-	for mth in range(1,2):
+	for mth in range(1,4):
 		manager = mp.Manager()
 		# def convert_array_to_numpy(dim1, dim2, shared_array):
 		# 	np_array = np.frombuffer(shared_array.get_obj())
 		# 	np_array.reshape((dim1, dim2))
 
 		#Create shared arrays and values
-		# num_days = monthrange(yr,mth)[1]
-		num_days = 6
+		num_days = monthrange(yr,mth)[1]
 		num_radars_north = mp.Array('i', num_days)
 		num_radars_south = mp.Array('i', num_days)
 		shared_gs_count_n = mp.Array('d', num_days*24)
@@ -40,7 +39,8 @@ for yr in range(2007,2008):
 		#Add the filepath to each file string 
 		fitfiles = [filepath + x for x in file_string]
 		good_files = np.where(np.array(fitfiles) != '/data/fitcon/2007/01/20070117.C0.han.fitacf.gz')
-		fitfiles = np.array(fitfiles)[good_files][80:96]
+		fitfiles = np.array(fitfiles)[good_files]
+		print 'Length of fitfiles: ', len(fitfiles)
 
 		def read_calculate(num_cnts_poss_n, num_cnts_poss_s, num_radars_north, num_radars_south, shared_gs_count_n, shared_is_count_n, shared_gs_count_s, shared_is_count_s, file, lock):
 			start = time.time()
@@ -60,9 +60,11 @@ for yr in range(2007,2008):
 			day = records[0]['time.dy']
 
 			if records[0]['stid'] in north_st_ids:
-				print "Worker in the North!"
 				lock.acquire()
 				num_radars_north[day-1] += 1
+				with open('file_for_north', 'a') as f:
+					f.write('{}\n'.format(file))
+					f.write('num_radars_north: {}\t{}\n'.format(num_radars_north))
 				lock.release()
 
 				list_hrs_n = []
@@ -108,9 +110,11 @@ for yr in range(2007,2008):
 				lock.release()
 
 			else:
-				print "Worker in the South!"
 				lock.acquire()
 				num_radars_south[day-1] += 1
+				with open('file_for_south', 'a') as f:
+					f.write('{}\n'.format(file))
+					f.write('num_radars_south: {}\n'.format(num))
 				lock.release()
 
 				list_hrs_s = []
@@ -154,63 +158,69 @@ for yr in range(2007,2008):
 					mod2 = num_cnts_poss_s[day-1]
 					mod2 = [mod2[x] + num_poss_rdr_s[x] for x in range(24)]
 					num_cnts_poss_s[day-1] = mod2
-
 				lock.release()
 
 		def multiprocessing_helper(cnts_n, cnts_s, north, south, gs_n, is_n, gs_s, is_s, array, lock):
+			counter = 0
 			for file in array:
 				read_calculate(cnts_n, cnts_s, north, south, gs_n, is_n, gs_s, is_s, file, lock)
+				counter += 1
+			lock.acquire()
+			with open('fitfiles_2007', 'a') as f:
+				f.write('{}\n\t{}\n'.format(os.getpid(), counter))
+			lock.release()
 
 		if file_count > 0:
 			fitfiles_split = np.array_split(fitfiles, 20)
 
+			with open('fitfiles_2007', 'a') as f:
+				f.write('Month: {}\n'.format(mth))
 			#Call function read_&_calculate for each file via multiprocessing
 			processes = []
 			for file_arr in fitfiles_split:
+				print 'month: ', mth, 'Length: ', len(file_arr)
 				p = mp.Process(target=multiprocessing_helper, args=(num_cnts_poss_n, num_cnts_poss_s, num_radars_north, num_radars_south, shared_gs_count_n, shared_is_count_n,
 				 shared_gs_count_s, shared_is_count_s, file_arr, lock))
 				processes.append(p)
 				p.start()
-			print len(processes)
 			for p in processes:
 				p.join()
 
 		print "Almost done month: " + str(mth)
+		with open('file_for_north', 'a') as f:
+			f.write('Final num_radars_north: {}\n'.format(num_radars_north[:]))
+		with open('file_for_south', 'a') as f:
+			f.write('Final num_radars_south: {}\n'.format(num_radars_south[:]))
 
-		gs_count_n = np.frombuffer(shared_gs_count_n.get_obj()).reshape((num_days,24))
-		is_count_n = np.frombuffer(shared_is_count_n.get_obj()).reshape((num_days,24))
-		gs_count_s = np.frombuffer(shared_gs_count_s.get_obj()).reshape((num_days,24))
-		is_count_s = np.frombuffer(shared_is_count_s.get_obj()).reshape((num_days,24))
+		# gs_count_n = np.frombuffer(shared_gs_count_n.get_obj()).reshape((num_days,24))
+		# is_count_n = np.frombuffer(shared_is_count_n.get_obj()).reshape((num_days,24))
+		# gs_count_s = np.frombuffer(shared_gs_count_s.get_obj()).reshape((num_days,24))
+		# is_count_s = np.frombuffer(shared_is_count_s.get_obj()).reshape((num_days,24))
 
-		# print "gs_count_n:", gs_count_n
-		# print "gs_count_s:", gs_count_s
-		# print "is_count_n:", is_count_n
-		# print "is_count_s:", is_count_s
-		# print "num_cnts_poss_n:", num_cnts_poss_n
-		start2 = time.time()
-		with open('hourly_counts_' + str(yr) +'_nh', 'a') as north, open('hourly_counts_' + str(yr) + '_sh','a') as south:
-			#Loop through days and hours and print to file
-			for day in range(num_days):
-				for hr in range(24):
-					try:
-						gs_frac_n = round(gs_count_n[day][hr]/num_cnts_poss_n[day][hr]*100, 4)
-					except:
-						gs_frac_n = float('nan')
-					try:
-						is_frac_n = round(is_count_n[day][hr]/num_cnts_poss_n[day][hr]*100, 4)
-					except:
-						is_frac_n = float('nan')
-					try:
-						gs_frac_s = round(gs_count_s[day][hr]/num_cnts_poss_s[day][hr]*100, 4)
-					except:
-						gs_frac_s = float('nan')
-					try:
-						is_frac_s = round(is_count_s[day][hr]/num_cnts_poss_s[day][hr]*100, 4)
-					except:
-						is_frac_s = float('nan')
+		# start2 = time.time()
+		# with open('hourly_counts_' + str(yr) +'_nh', 'a') as north, open('hourly_counts_' + str(yr) + '_sh','a') as south:
+		# 	#Loop through days and hours and print to file
+		# 	for day in range(num_days):
+		# 		for hr in range(24):
+		# 			try:
+		# 				gs_frac_n = round(gs_count_n[day][hr]/num_cnts_poss_n[day][hr]*100, 4)
+		# 			except:
+		# 				gs_frac_n = float('nan')
+		# 			try:
+		# 				is_frac_n = round(is_count_n[day][hr]/num_cnts_poss_n[day][hr]*100, 4)
+		# 			except:
+		# 				is_frac_n = float('nan')
+		# 			try:
+		# 				gs_frac_s = round(gs_count_s[day][hr]/num_cnts_poss_s[day][hr]*100, 4)
+		# 			except:
+		# 				gs_frac_s = float('nan')
+		# 			try:
+		# 				is_frac_s = round(is_count_s[day][hr]/num_cnts_poss_s[day][hr]*100, 4)
+		# 			except:
+		# 				is_frac_s = float('nan')
 
-					north.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day+1, hr, gs_frac_n, is_frac_n, num_radars_north[day]))
-					south.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day+1, hr, gs_frac_s, is_frac_s, num_radars_south[day]))
+		# 			north.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day+1, hr, gs_frac_n, is_frac_n, num_radars_north[day]))
+		# 			south.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day+1, hr, gs_frac_s, is_frac_s, num_radars_south[day]))
 
-		end2 = time.time()
-		print 'writing takes' + str(end2-start2) + 'seconds'
+		# end2 = time.time()
+		# print 'writing takes' + str(end2-start2) + 'seconds'
