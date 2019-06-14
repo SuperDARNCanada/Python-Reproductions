@@ -49,10 +49,7 @@ def calc_counts_daily(date):
 		
 		num_gates = 16
 		# select data for range gates 0-15
-		index = np.where(records[i]['slist'] < 16)[0]
-		ranges = [records[i]['slist'][x] for x in index]
-		gflg = [records[i]['gflg'][x] for x in index]
-
+		
 		if records[0]['stid'] in north_st_ids:
 			num_radars_north += 1
 			list_hrs_n = []
@@ -62,6 +59,10 @@ def calc_counts_daily(date):
 				list_hrs_n.append(hr)
 
 				try:
+					index = np.where(records[i]['slist'] < 16)[0]
+					ranges = [records[i]['slist'][x] for x in index]
+					gflg = [records[i]['gflg'][x] for x in index]
+
 					gs_count_n[hr] += np.count_nonzero(gflg)
 					pwr = [records[i]['pwr0'][x] for x in ranges]
 
@@ -90,6 +91,9 @@ def calc_counts_daily(date):
 				list_hrs_s.append(hr)
 
 				try:
+					index = np.where(records[i]['slist'] < 16)[0]
+					ranges = [records[i]['slist'][x] for x in index]
+					gflg = [records[i]['gflg'][x] for x in index]
 
 					gs_count_s[hr] += np.count_nonzero(gflg)
 					pwr = [records[i]['pwr0'][x] for x in ranges]
@@ -109,7 +113,7 @@ def calc_counts_daily(date):
 				[num_poss_rdr_s.insert(x,0) for x in missing_hrs]
 				num_cnts_poss_s = [num_cnts_poss_s[x] + num_poss_rdr_s[x] for x in range(24)]
 
-	with open('nh_data_' + str(date), 'a') as north, open('sh_data_' + str(date), 'a') as south:
+	with open('nh_first15_' + str(date), 'a') as north, open('sh_first15_' + str(date), 'a') as south:
 		for hr in range(24):
 			gs_frac_n = gs_count_n[hr]/num_cnts_poss_n[hr]
 			is_frac_n = is_count_n[hr]/num_cnts_poss_n[hr]

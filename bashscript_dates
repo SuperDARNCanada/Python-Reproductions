@@ -16,5 +16,5 @@ do
 	dates="$(date +%Y%m%d -d "$dates + 1 days")"
 done
 echo 'Have created dates file, trying parallel'
-cat dates_file | parallel --max-args=1 --jobs 12 python counts_code.py {1}
+cat dates_file | parallel -u --max-args=1 --jobs 8 'echo starting {};python counts_code.py {};echo finished {};'
 date
