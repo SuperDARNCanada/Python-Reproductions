@@ -1,3 +1,4 @@
+#!/bin/bash
 # Takes in a date range as arguments and searches for files missing, then writes those missing dates to a file
 # Does not include the date at the end of the range
 startdate=$1
@@ -5,10 +6,10 @@ enddate=$2
 dates=$1
 while (($dates != $enddate))
 do 
-	file='nh_first15_$dates'
+	file=nh_first15_$dates
 	if ! [[ -f $file ]]
 	then
-		echo $file >> missing_dates
+		echo $dates >> missing_dates
 	fi
 	dates="$(date +%Y%m%d -d "$dates + 1 days")"
 done

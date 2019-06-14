@@ -1,34 +1,25 @@
-import backscatter.dmap.dmap as dm
 import numpy as np
 import os, sys
-import gzip
-import bz2
 from calendar import monthrange
 import collections
-import multiprocessing as mp
-import time
+from datetime import datetime as dt
+import matplotlib.pyplot as plt
 
-yr = 2007
-mth = 4
+yr = np.loadtxt('nh_allgates_2007')[:,0]
+mth = np.loadtxt('nh_allgates_2007')[:,1]
+day = np.loadtxt('nh_allgates_2007')[:,2]
+hr = np.loadtxt('nh_allgates_2007')[:,3]
+gs_count = np.loadtxt('nh_allgates_2007')[:,4]
+is_count = np.loadtxt('nh_allgates_2007')[:,5]
+total_count = np.loadtxt('nh_allgates_2007')[:,6]
+gs_frac = np.loadtxt('nh_allgates_2007')[:,7]
+is_frac = np.loadtxt('nh_allgates_2007')[:,8]
+num_rdrs = np.loadtxt('nh_allgates_2007')[:,9]
+time_array = np.zeros(length(yr))
 
-filepath = "/data/fitcon/" + str(yr) + "/" + str(mth).zfill(2) + "/"
-file_string = sorted(np.array(os.listdir(filepath)))
-file_count = len(file_string)
+for i, (m, d, h) in enumerate(zip(mth, day, hr)):
+	time_array[i] = dt(m,d,h)
 
-#Add the filepath to each file string 
-fitfiles = [filepath + x for x in file_string]
-good_files = np.where(np.array(fitfiles) != '/data/fitcon/2007/01/20070117.C0.han.fitacf.gz')
-fitfiles = np.array(fitfiles)[good_files]
-
-with gzip.open(fitfiles[0], 'r') as f:
-	raw_data = f.read()
-records = dm.parse_dmap_format_from_stream(raw_data)
-
-thirt_ctr = 0
-start = time.time()
-for rec in records:
-	if rec['bmnum'] == 13:
-		 thirt_ctr += 1
-end = time.time()
-print(thirt_ctr)
-print(end - start)
+plt.figure(1)
+plt.plot(time_array, gs_count)
+plt.show()
