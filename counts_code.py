@@ -1,4 +1,8 @@
+# Calculates the ground and ionospheric echos per hour from all radars, north and south
+# separately, through a specified number of range gates
 import backscatter.dmap.dmap as dm
+from backscatter.dmap.dmap import DmapDataError
+from backscatter.dmap.dmap import EmptyFileError
 import numpy as np
 import fnmatch
 import os, sys
@@ -6,7 +10,7 @@ import gzip
 import bz2
 from calendar import monthrange
 import collections
-import time
+import time	
 
 def calc_counts_daily(date):
 	yr = str(date)[:4]
@@ -34,19 +38,41 @@ def calc_counts_daily(date):
 	for file in fitfiles:
 		# print 'The file is:', file
 		start = time.time()
-		if '.gz' in file:
-			with gzip.open(file, 'r') as f:
-				raw_data = f.read()
-			records = dm.parse_dmap_format_from_stream(raw_data)
-		elif '.bz2' in file:
-			with bz2.BZ2File(file, 'r') as f:
-				raw_data = f.read()
-			records = dm.parse_dmap_format_from_stream(raw_data)
-		else:
-			records = dm.parse_dmap_format_from_file(file)
-		end = time.time()
-		# print 'Opening file ' + str(file) + ' took ' + str(end-start) + ' seconds'
-		
+
+		try:
+			if '.gz' in file:
+				with gzip.open(file, 'r') as f:
+					raw_data = f.read()
+				records = dm.parse_dmap_format_from_stream(raw_data)
+			elif '.bz2' in file:
+				with bz2.BZ2File(file, 'r') as f:
+					raw_data = f.read()
+				records = dm.parse_dmap_format_from_stream(raw_data)
+			else:
+				records = dm.parse_dmap_format_from_file(file)
+			end = time.time()
+			# print 'Opening file ' + str(file) + ' took ' + str(end-start) + ' seconds'
+		except EOFError as err:
+			with open('errors_list', 'a') as f:
+				f.write('{}\t{}\n'.format(file, err))
+			print 'logged EOFError'
+			continue
+		except DmapDataError as err:
+			with open('errors_list', 'a') as f:
+				f.write('{}\t{}\n'.format(file, err))
+			print 'logged corrupt file error'
+			continue
+		except EmptyFileError as err:
+			with open('errors_list', 'a') as f:
+				f.write('{}\t{}\n'.format(file, err))
+			print 'logged data stream error'
+			continue
+		except:
+			with open('errors_list', 'a') as f:
+				f.write('{}\t{}\n'.format(file, 'unknown error'))
+			print 'logged some other error'
+			continue
+
 		num_gates = 16
 		# select data for range gates 0-15
 		
@@ -119,13 +145,10 @@ def calc_counts_daily(date):
 			is_frac_n = is_count_n[hr]/num_cnts_poss_n[hr]
 			gs_frac_s = gs_count_s[hr]/num_cnts_poss_s[hr]
 			is_frac_s = is_count_s[hr]/num_cnts_poss_s[hr]
-			# print "I'm writing now."
+			
 			north.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day, hr, gs_count_n[hr], is_count_n[hr], num_cnts_poss_n[hr], gs_frac_n, is_frac_n, num_radars_north))
 			south.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day, hr, gs_count_s[hr], is_count_s[hr], num_cnts_poss_s[hr], gs_frac_s, is_frac_s, num_radars_south))
 
 if __name__ == '__main__':
 	date = sys.argv[1]
-	# print "The argument is: ", date
-	# print "calling function..."
 	calc_counts_daily(date)
-	# print "I'm Done!"
