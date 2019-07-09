@@ -6,7 +6,7 @@ enddate=$2
 dates=$1
 while (($dates != $enddate))
 do 
-	file=nh_first15_$dates
+	file=nh_16to32_$dates
 	if ! [[ -f $file ]]
 	then
 		echo $dates >> missing_dates
