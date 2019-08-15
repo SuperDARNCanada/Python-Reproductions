@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script for creating a file with a list of dates, to be used for multiprocessing Python
-# script. Takes two arguments, start date and end date.
+# script. Takes two arguments: start date and end date.
 date
 startdate=$1
 enddate=$2
@@ -16,5 +16,45 @@ do
 	dates="$(date +%Y%m%d -d "$dates + 1 days")"
 done
 echo 'Have created dates file, trying parallel'
-cat dates_file | parallel -u --max-args=1 --jobs 8 'echo starting {};python counts_code.py {};echo finished {};'
+cat dates_file | parallel -u --max-args=1 --jobs 30 'echo starting {};python echos_code.py {};echo finished {};'
 date
+
+echo 'finding missing dates'
+rm missing_dates
+./find_missing $startdate $enddate
+if [ -f missing_dates ]
+then
+	echo 'starting parallel for missing dates'
+	cat missing_dates | parallel -u --max-args=1 --jobs 30 'echo starting {};python echos_code.py {};echo finished {};'
+fi
+
+echo 'concatenating dates files'
+cat nh_0to15_"${startdate:0:4}"* > nh_0to15_"${startdate:0:4}"
+cat sh_0to15_"${startdate:0:4}"* > sh_0to15_"${startdate:0:4}"
+# cat nh_16to32_"${startdate:0:4}"* > nh_16to32_"${startdate:0:4}"
+# cat sh_16to32_"${startdate:0:4}"* > sh_16to32_"${startdate:0:4}"
+# cat nh_33to48_"${startdate:0:4}"* > nh_33to48_"${startdate:0:4}"
+# cat sh_33to48_"${startdate:0:4}"* > sh_33to48_"${startdate:0:4}"
+# cat nh_49to64_"${startdate:0:4}"* > nh_49to64_"${startdate:0:4}"
+# cat sh_49to64_"${startdate:0:4}"* > sh_49to64_"${startdate:0:4}"
+
+mv ~/Python-Reproductions/nh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_0to15
+mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_0to15
+# mv ~/Python-Reproductions/nh_16to32_"${startdate:0:4}" ~/Python-Reproductions/RG_16to32
+# mv ~/Python-Reproductions/sh_16to32_"${startdate:0:4}" ~/Python-Reproductions/RG_16to32
+# mv ~/Python-Reproductions/nh_33to48_"${startdate:0:4}" ~/Python-Reproductions/RG_33to48
+# mv ~/Python-Reproductions/sh_33to48_"${startdate:0:4}" ~/Python-Reproductions/RG_33to48
+# mv ~/Python-Reproductions/nh_49to64_"${startdate:0:4}" ~/Python-Reproductions/RG_49to64
+# mv ~/Python-Reproductions/sh_49to64_"${startdate:0:4}" ~/Python-Reproductions/RG_49to64
+
+mv ~/Python-Reproductions/nh_0to15_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/nh_16to32_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/sh_16to32_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/nh_33to48_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/sh_33to48_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/nh_49to64_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/sh_49to64_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+
+date
+echo 'Done!'

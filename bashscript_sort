@@ -1,0 +1,8 @@
+#!/bin/bash
+# Script to sort and eliminate duplicate lines in files
+for year in `seq 2007 2008`
+do
+	echo $year
+	sort -V -u ~/Python-Reproductions/"${year}"/nh_16to32_"${year}" > ~/Python-Reproductions/"${year}"/nh_16to32_"${year}"_b
+	sort -V -u ~/Python-Reproductions/"${year}"/sh_16to32_"${year}" > ~/Python-Reproductions/"${year}"/sh_16to32_"${year}"_b
+done

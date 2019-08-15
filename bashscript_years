@@ -1,0 +1,10 @@
+#!/bin/bash
+# Script creating list of years to feed to bashscript_dates
+var=$1
+endyear=$2
+for year in `seq $var $endyear`
+do 
+	echo 'In sequence loop, on year' $year
+	endrange="$(date +%Y%m%d -d "${year}0101 + 1 year")"
+	./bashscript_dates "${year}0101" $endrange
+done

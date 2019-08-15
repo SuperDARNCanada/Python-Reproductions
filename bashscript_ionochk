@@ -1,0 +1,22 @@
+#!/bin/bash
+# Script for creating a file with a list of dates, to be used for multiprocessing Python
+# script. Takes two arguments, start date and end date.
+date
+startdate=$1
+enddate=$2
+dates=$1
+while (($dates != $enddate))
+do 
+	if [ $dates = $startdate ]
+	then
+		echo $dates > dates_file
+	else
+		echo $dates >> dates_file
+	fi
+	dates="$(date +%Y%m%d -d "$dates + 1 days")"
+done
+echo 'Have created dates file, trying parallel'
+cat dates_file | parallel -u --max-args=1 --jobs 8 'echo starting {};python iono_counts_chk.py {};echo finished {};'
+date
+cat check_ionoN_* > check_ionoN
+cat check_ionoS_* > check_ionoS
