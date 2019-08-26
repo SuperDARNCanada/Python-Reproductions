@@ -6,7 +6,6 @@ import gzip
 import bz2
 from calendar import monthrange
 import collections
-import time
 
 def find_arrays(date):
 	yr = str(date)[:4]
@@ -23,53 +22,39 @@ def find_arrays(date):
 	fitfiles = np.array(fitfiles)[good_files]
 
 	for file in fitfiles:
-		try:
-			if '.gz' in file:
-				with gzip.open(file, 'r') as f:
-					raw_data = f.read()
-				records = dm.parse_dmap_format_from_stream(raw_data)
-			elif '.bz2' in file:
-				with bz2.BZ2File(file, 'r') as f:
-					raw_data = f.read()
-				records = dm.parse_dmap_format_from_stream(raw_data)
-			else:
-				records = dm.parse_dmap_format_from_file(file)
-			end = time.time()
-			# print 'Opening file ' + str(file) + ' took ' + str(end-start) + ' seconds'
-		except EOFError as err:
-			with open('errors_list', 'a') as f:
-				f.write('{}\t{}\n'.format(file, err))
-			print 'logged EOFError'
-			continue
-		except DmapDataError as err:
-			with open('errors_list', 'a') as f:
-				f.write('{}\t{}\n'.format(file, err))
-			print 'logged corrupt file error'
-			continue
-		except EmptyFileError as err:
-			with open('errors_list', 'a') as f:
-				f.write('{}\t{}\n'.format(file, err))
-			print 'logged data stream error'
-			continue
-		except:
-			with open('errors_list', 'a') as f:
-				f.write('{}\t{}\n'.format(file, 'unknown error'))
-			print 'logged some other error'
-			continue
+		if '.gz' in file:
+			with gzip.open(file, 'r') as f:
+				raw_data = f.read()
+			records = dm.parse_dmap_format_from_stream(raw_data)
+		elif '.bz2' in file:
+			with bz2.BZ2File(file, 'r') as f:
+				raw_data = f.read()
+			records = dm.parse_dmap_format_from_stream(raw_data)
+		else:
+			records = dm.parse_dmap_format_from_file(file)
+		# print 'Opening file ' + str(file) + ' took ' + str(end-start) + ' seconds'
 
 		#Save the gflg and slist arrays to see why iono counts are zero
 		for x in range(len(records)):
 			try:
+				idx = records[x]['slist']
+				pwr = [records[x]['pwr0'][i] for i in idx]
+
 				if records[0]['stid'] in north_st_ids:
 					with open('check_ionoN_' + str(date), 'a') as f:
 						f.write('{}\n'.format(file))
-						f.write('{}\t{}\n'.format(records[x]['slist'], records[x]['gflg']))
+						f.write('{}\t{}\t{}\n'.format(idx, records[x]['gflg'], pwr))
 				elif records[0]['stid'] in south_st_ids:
 					with open('check_ionoS_' + str(date), 'a') as f:
 						f.write('{}\n'.format(file))
-						f.write('{}\t{}\n'.format(records[x]['slist'], records[x]['gflg']))
+						f.write('{}\t{}\t{}\n'.format(idx, records[x]['gflg'], pwr))
 			except:
-				pass
+				if records[0]['stid'] in north_st_ids:
+					with open('check_ionoN_' + str(date), 'a') as f:
+						f.write('{}\t{}\n'.format(file, 'there was a problem'))
+				elif records[0]['stid'] in south_st_ids:
+					with open('check_ionoS_' + str(date), 'a') as f:
+						f.write('{}\t{}\n'.format(file, 'there was a problem'))
 
 if __name__ == '__main__':
 	date = sys.argv[1]

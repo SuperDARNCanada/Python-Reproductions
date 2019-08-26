@@ -1,3 +1,8 @@
+# (C) SuperDARN Canada University of Saskatchewan 
+
+# This code contains the necessary modification to run Python Multiprocessing
+# and calculate the number of echos in each month of each year
+
 import backscatter.dmap.dmap as dm
 import numpy as np
 import os, sys
@@ -19,8 +24,8 @@ for yr in range(2007,2008):
 		# 	np_array.reshape((dim1, dim2))
 
 		#Create shared arrays and values
-		# num_days = monthrange(yr,mth)[1]
-		num_days = 6
+		num_days = monthrange(yr,mth)[1]
+		# num_days = 6
 		num_radars_north = mp.Array('i', num_days)
 		num_radars_south = mp.Array('i', num_days)
 		shared_gs_count_n = mp.Array('d', num_days*24)
@@ -40,7 +45,7 @@ for yr in range(2007,2008):
 		#Add the filepath to each file string 
 		fitfiles = [filepath + x for x in file_string]
 		good_files = np.where(np.array(fitfiles) != '/data/fitcon/2007/01/20070117.C0.han.fitacf.gz')
-		fitfiles = np.array(fitfiles)[good_files][80:96]
+		fitfiles = np.array(fitfiles)[good_files]
 
 		def read_calculate(num_cnts_poss_n, num_cnts_poss_s, num_radars_north, num_radars_south, shared_gs_count_n, shared_is_count_n, shared_gs_count_s, shared_is_count_s, file, lock):
 			start = time.time()
@@ -72,8 +77,6 @@ for yr in range(2007,2008):
 					list_hrs_n.append(hr)
 
 					lock.acquire()
-					#Check for a gflg array
-					# if records[i].keys().count('gflg') == 0:
 					try:
 						idx = (day-1)*24 + hr
 						#Find ground scatter count in NH
@@ -90,9 +93,11 @@ for yr in range(2007,2008):
 						shared_gs_count_n[idx] += 0
 						shared_is_count_n[idx] += 0
 					lock.release()
+
 				#Create the list of # records per hour for this radar x 75, this is possible counts for this radar per hour
 				counter_n=collections.Counter(list_hrs_n)
 				num_poss_rdr_n = [x*75 for x in counter_n.values()]
+
 				#Add this list of possbile counts to list of total counts for all radars, per day
 				lock.acquire()
 				try:
@@ -120,8 +125,6 @@ for yr in range(2007,2008):
 					list_hrs_s.append(hr)
 
 					lock.acquire()
-					#Check for a gflg array
-					#if records[i].keys().count('gflg') == 0:
 					try:
 						idx = (day-1)*24 + hr
 						#Find ground scatter count in SH
@@ -138,6 +141,7 @@ for yr in range(2007,2008):
 						shared_gs_count_s[idx] += 0
 						shared_is_count_s[idx] += 0
 					lock.release()
+					
 				#Create the lists of # records per hour for this radar x 75, this is possible counts for this radar per hour
 				counter_s = collections.Counter(list_hrs_s)
 				num_poss_rdr_s = [x*75 for x in counter_s.values()]
@@ -182,11 +186,6 @@ for yr in range(2007,2008):
 		gs_count_s = np.frombuffer(shared_gs_count_s.get_obj()).reshape((num_days,24))
 		is_count_s = np.frombuffer(shared_is_count_s.get_obj()).reshape((num_days,24))
 
-		# print "gs_count_n:", gs_count_n
-		# print "gs_count_s:", gs_count_s
-		# print "is_count_n:", is_count_n
-		# print "is_count_s:", is_count_s
-		# print "num_cnts_poss_n:", num_cnts_poss_n
 		start2 = time.time()
 		with open('hourly_counts_' + str(yr) +'_nh', 'a') as north, open('hourly_counts_' + str(yr) + '_sh','a') as south:
 			#Loop through days and hours and print to file

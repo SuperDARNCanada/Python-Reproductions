@@ -18,5 +18,5 @@ done
 echo 'Have created dates file, trying parallel'
 cat dates_file | parallel -u --max-args=1 --jobs 8 'echo starting {};python iono_counts_chk.py {};echo finished {};'
 date
-cat check_ionoN_* > check_ionoN
-cat check_ionoS_* > check_ionoS
+cat check_ionoN_* >> check_ionoN
+cat check_ionoS_* >> check_ionoS

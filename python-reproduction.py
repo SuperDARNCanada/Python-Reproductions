@@ -1,3 +1,7 @@
+# (C) SuperDARN Canada University of Saskatchewan 
+
+# This script calculates the number of echos off the ground and ionospher for each month in a year range
+# without the use of multiprocessing
 import backscatter.dmap.dmap as dm
 import numpy as np
 import os, sys
@@ -11,7 +15,8 @@ south_st_ids = [24, 96, 21, 4, 15, 20, 11, 22, 13, 12, 14, 18, 19]
 
 for yr in range(2007,2008):
     for mth in range(1,2):
-        num_days = 6
+        num_days = monthrange(yr,mth)[1]
+        # num_days = 6
         gs_count_n = np.zeros((num_days,24))
         is_count_n = np.zeros((num_days,24))
         gs_count_s = np.zeros((num_days,24))
@@ -26,7 +31,7 @@ for yr in range(2007,2008):
         #Add the filepath to each file string, remove the bad file
         fitfiles = [filepath + x for x in file_string]
         good_files = np.where(np.array(fitfiles) != '/data/fitcon/2007/01/20070117.C0.han.fitacf.gz')
-        fitfiles = np.array(fitfiles)[good_files][80:96]
+        fitfiles = np.array(fitfiles)[good_files]
 
         if file_count > 0:
             num_radars_north = 0
@@ -55,8 +60,6 @@ for yr in range(2007,2008):
                         hr = records[i]['time.hr']
                         list_hrs_n.append(hr)
 
-                        #Check for a gflg array
-                        # if records[i].keys().count('gflg') == 0:
                         try:
                             #Find ground scatter count in NH
                             gs_count_n[day-1][hr] += np.count_nonzero(records[i]['gflg'])
@@ -74,6 +77,7 @@ for yr in range(2007,2008):
                     #Create the list of # records per hour for this radar x 75, this is possible counts for this radar per hour
                     counter_n=collections.Counter(list_hrs_n)
                     num_poss_rdr_n = [x*75 for x in counter_n.values()]
+
                     #Add this list of possbile counts to list of total counts for all radars, per day
                     try:
                         num_cnts_poss_n[day-1] = [num_cnts_poss_n[day-1][x] + num_poss_rdr_n[x] for x in range(24)]
@@ -86,13 +90,12 @@ for yr in range(2007,2008):
                 else:
                     num_radars_south += 1
                     list_hrs_s = []
+
                     #Loop through the records in the currently opened file
                     for i in range(len(records)):
                         hr = records[i]['time.hr']
                         list_hrs_s.append(hr)
-
-                        #Check for a gflg array
-                        #if records[i].keys().count('gflg') == 0:
+                        
                         try:
                             #Find ground scatter count in SH
                             gs_count_s[day-1][hr] += np.count_nonzero(records[i]['gflg'])

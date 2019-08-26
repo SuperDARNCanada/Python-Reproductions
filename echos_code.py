@@ -1,4 +1,12 @@
 # (C) SuperDARN Canada University of Saskatchewan 
+# This script contains multiple functions necessary for the calculation of the number of ground 
+# and ionospheric echos in a given day. This code is callable through GNU parallel to obtain
+# calculations for a range of days. As a result, this script requires one input value, in the
+# format of a date string - yyyymmdd
+
+# Note that the format of the file reading assumes that there is only one file type for a given
+# radar on the chosen day. ie: if there is both a .gz and .bz2, it will open both.
+
 import backscatter.dmap.dmap as dm
 from backscatter.dmap.dmap import DmapDataError
 from backscatter.dmap.dmap import EmptyFileError
@@ -143,18 +151,18 @@ def calc_counts_daily(date):
 			# print 'Begin loop through records'
 			start = time.time()
 			for i in range(len(records)):
-				# gscN_1, iscN_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscN_1, iscN_1)
-				# gscN_2, iscN_2, hrs_2 = counts_calcs(records, 32, 49, hrs_2, i, gscN_2, iscN_2)
-				# gscN_3, iscN_3, hrs_3 = counts_calcs(records, 48, 65, hrs_3, i, gscN_3, iscN_3)
+				gscN_1, iscN_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscN_1, iscN_1)
+				gscN_2, iscN_2, hrs_2 = counts_calcs(records, 32, 49, hrs_2, i, gscN_2, iscN_2)
+				gscN_3, iscN_3, hrs_3 = counts_calcs(records, 48, 65, hrs_3, i, gscN_3, iscN_3)
 				gscN_4, iscN_4, hrs_4 = counts_calcs(records, 0, 16, hrs_4, i, gscN_4, iscN_4)
 			end = time.time()
 			# print 'Total records looping time is ' + str(end-start) + ' seconds'
 
 			# Create the list of # records per hour for this radar times the number of gates, this is 
 			# possible counts for this radar per hour
-			# ncp_n1 = total_calcs(hrs_1, num_gates, ncp_n1)
-			# ncp_n2 = total_calcs(hrs_2, num_gates, ncp_n2)
-			# ncp_n3 = total_calcs(hrs_3, num_gates, ncp_n3)
+			ncp_n1 = total_calcs(hrs_1, num_gates, ncp_n1)
+			ncp_n2 = total_calcs(hrs_2, num_gates, ncp_n2)
+			ncp_n3 = total_calcs(hrs_3, num_gates, ncp_n3)
 			ncp_n4 = total_calcs(hrs_4, num_gates, ncp_n4)
 
 		else:
@@ -164,25 +172,25 @@ def calc_counts_daily(date):
 			# print 'Begin loop through records'
 			start = time.time()
 			for i in range(len(records)):
-				# gscS_1, iscS_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscS_1, iscS_1)
-				# gscS_2, iscS_2, hrs_2 = counts_calcs(records, 32, 49, hrs_2, i, gscS_2, iscS_2)
-				# gscS_3, iscS_3, hrs_3 = counts_calcs(records, 48, 65, hrs_3, i, gscS_3, iscS_3)
+				gscS_1, iscS_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscS_1, iscS_1)
+				gscS_2, iscS_2, hrs_2 = counts_calcs(records, 32, 49, hrs_2, i, gscS_2, iscS_2)
+				gscS_3, iscS_3, hrs_3 = counts_calcs(records, 48, 65, hrs_3, i, gscS_3, iscS_3)
 				gscS_4, iscS_4, hrs_4 = counts_calcs(records, 0, 16, hrs_4, i, gscS_4, iscS_4)
 			end = time.time()
 			# print 'Total records looping time is ' + str(end-start) + ' seconds'
 
-			# ncp_s1 = total_calcs(hrs_1, num_gates, ncp_s1)
-			# ncp_s2 = total_calcs(hrs_2, num_gates, ncp_s2)
-			# ncp_s3 = total_calcs(hrs_3, num_gates, ncp_s3)
+			ncp_s1 = total_calcs(hrs_1, num_gates, ncp_s1)
+			ncp_s2 = total_calcs(hrs_2, num_gates, ncp_s2)
+			ncp_s3 = total_calcs(hrs_3, num_gates, ncp_s3)
 			ncp_s4 = total_calcs(hrs_4, num_gates, ncp_s4)
 
 	end_for = time.time()
 	# print 'Looping through files took ' + str(end_for - start_for) + ' seconds'
 	# print 'Starting file population'
 	
-	# write_to_file(gscN_1, iscN_1, gscS_1, iscS_1, ncp_n1, ncp_s1, yr, mth, day, num_radars_north, num_radars_south, '16to32')
-	# write_to_file(gscN_2, iscN_2, gscS_2, iscS_2, ncp_n2, ncp_s2, yr, mth, day, num_radars_north, num_radars_south, '33to48')
-	# write_to_file(gscN_3, iscN_3, gscS_3, iscS_3, ncp_n3, ncp_s3, yr, mth, day, num_radars_north, num_radars_south, '49to64')
+	write_to_file(gscN_1, iscN_1, gscS_1, iscS_1, ncp_n1, ncp_s1, yr, mth, day, num_radars_north, num_radars_south, '16to32')
+	write_to_file(gscN_2, iscN_2, gscS_2, iscS_2, ncp_n2, ncp_s2, yr, mth, day, num_radars_north, num_radars_south, '33to48')
+	write_to_file(gscN_3, iscN_3, gscS_3, iscS_3, ncp_n3, ncp_s3, yr, mth, day, num_radars_north, num_radars_south, '49to64')
 	write_to_file(gscN_4, iscN_4, gscS_4, iscS_4, ncp_n4, ncp_s4, yr, mth, day, num_radars_north, num_radars_south, '0to15')
 
 if __name__ == '__main__':

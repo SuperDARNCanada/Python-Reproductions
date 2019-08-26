@@ -87,7 +87,7 @@ def calc_counts_daily(date):
 				try:
 					index = np.where((records[i]['slist'] > 15) & (records[i]['slist'] < 33))[0]
 					ranges = [records[i]['slist'][x] for x in index]
-					gflg = [records[i]['gflg'][x] for x in index]
+					gflg = np.array([records[i]['gflg'][x] for x in index])
 
 					gs_count_n[hr] += np.count_nonzero(gflg)
 					pwr = [records[i]['pwr0'][x] for x in ranges]
@@ -119,7 +119,7 @@ def calc_counts_daily(date):
 				try:
 					index = np.where((records[i]['slist'] > 15) & (records[i]['slist'] < 33))[0]
 					ranges = [records[i]['slist'][x] for x in index]
-					gflg = [records[i]['gflg'][x] for x in index]
+					gflg = np.array([records[i]['gflg'][x] for x in index])
 
 					gs_count_s[hr] += np.count_nonzero(gflg)
 					pwr = [records[i]['pwr0'][x] for x in ranges]
