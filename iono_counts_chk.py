@@ -1,3 +1,6 @@
+# (C) SuperDARN Canada University of Saskatchewan 
+# Test code for error in ionospheric counts calculation, error was found to be related
+# to Python array notation and searching
 import backscatter.dmap.dmap as dm
 import numpy as np
 import fnmatch

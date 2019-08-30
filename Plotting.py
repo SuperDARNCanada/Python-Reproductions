@@ -59,14 +59,14 @@ def plot_echos_N(year, rgates): #rgates is a list of range gate options
 	plt.title('Echos vs Time - North ' + str(yr[0]))
 	plt.xlabel('Time')
 	plt.ylabel('Ground Echo Counts per Radar')
-	plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/GSechosN_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
+	# plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/GSechosN_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
 
 	plt.figure(2)
 	plt.plot(dates, is_count/num_rdrs)
 	plt.title('Echos vs Time - North ' + str(yr[0]))
 	plt.xlabel('Time')
 	plt.ylabel('Ionospheric Echo Counts per Radar')
-	plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/ISechosN_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
+	# plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/ISechosN_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
 
 	plt.show(block=True)
 
@@ -115,14 +115,14 @@ def plot_echos_S(year, rgates):
 	plt.title('Echos vs Time - South ' + str(yr[0]))
 	plt.xlabel('Time')
 	plt.ylabel('Ground Echo Counts per Radar')
-	plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/GSechosS_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
+	# plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/GSechosS_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
 
 	plt.figure(2)
 	plt.plot(dates, is_count/num_rdrs)
 	plt.title('Echos vs Time - South ' + str(yr[0]))
 	plt.xlabel('Time')
 	plt.ylabel('Ionospheric Echo Counts per Radar')
-	plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/ISechosS_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
+	# plt.savefig('/home/kehler/Python-Reproductions/EchoPlots/EPlots_{}{}/ISechosS_{}.jpg'.format(gts[:4], rgates[-1][-2:], year))
 	
 	plt.show(block=True)
 

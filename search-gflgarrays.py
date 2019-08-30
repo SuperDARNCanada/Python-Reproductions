@@ -1,3 +1,6 @@
+# (C) SuperDARN Canada University of Saskatchewan 
+# Searches SuperDarn fitacf files for gflg arrays
+
 import backscatter.dmap.dmap as dm
 import numpy as np
 import os, sys

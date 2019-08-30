@@ -1,5 +1,8 @@
+# (C) SuperDARN Canada University of Saskatchewan 
 # Calculates the ground and ionospheric echos per hour from all radars, north and south
 # separately, through a specified number of range gates
+
+# Original code, not updated for variable range gates
 import backscatter.dmap.dmap as dm
 from backscatter.dmap.dmap import DmapDataError
 from backscatter.dmap.dmap import EmptyFileError

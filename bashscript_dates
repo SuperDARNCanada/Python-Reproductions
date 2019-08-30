@@ -29,8 +29,8 @@ then
 fi
 
 echo 'concatenating dates files'
-cat nh_0to15_"${startdate:0:4}"* > nh_0to15_"${startdate:0:4}"
-cat sh_0to15_"${startdate:0:4}"* > sh_0to15_"${startdate:0:4}"
+# cat nh_0to15_"${startdate:0:4}"* > nh_0to15_"${startdate:0:4}"
+# cat sh_0to15_"${startdate:0:4}"* > sh_0to15_"${startdate:0:4}"
 # cat nh_16to32_"${startdate:0:4}"* > nh_16to32_"${startdate:0:4}"
 # cat sh_16to32_"${startdate:0:4}"* > sh_16to32_"${startdate:0:4}"
 # cat nh_33to48_"${startdate:0:4}"* > nh_33to48_"${startdate:0:4}"
@@ -38,8 +38,8 @@ cat sh_0to15_"${startdate:0:4}"* > sh_0to15_"${startdate:0:4}"
 # cat nh_49to64_"${startdate:0:4}"* > nh_49to64_"${startdate:0:4}"
 # cat sh_49to64_"${startdate:0:4}"* > sh_49to64_"${startdate:0:4}"
 
-mv ~/Python-Reproductions/nh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_0to15
-mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_0to15
+# mv ~/Python-Reproductions/nh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_0to15
+# mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_0to15
 # mv ~/Python-Reproductions/nh_16to32_"${startdate:0:4}" ~/Python-Reproductions/RG_16to32
 # mv ~/Python-Reproductions/sh_16to32_"${startdate:0:4}" ~/Python-Reproductions/RG_16to32
 # mv ~/Python-Reproductions/nh_33to48_"${startdate:0:4}" ~/Python-Reproductions/RG_33to48
@@ -47,8 +47,8 @@ mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}" ~/Python-Reproductions/RG_
 # mv ~/Python-Reproductions/nh_49to64_"${startdate:0:4}" ~/Python-Reproductions/RG_49to64
 # mv ~/Python-Reproductions/sh_49to64_"${startdate:0:4}" ~/Python-Reproductions/RG_49to64
 
-mv ~/Python-Reproductions/nh_0to15_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
-mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/nh_0to15_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
+# mv ~/Python-Reproductions/sh_0to15_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
 # mv ~/Python-Reproductions/nh_16to32_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
 # mv ~/Python-Reproductions/sh_16to32_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"
 # mv ~/Python-Reproductions/nh_33to48_"${startdate:0:4}"* ~/Python-Reproductions/"${startdate:0:4}"

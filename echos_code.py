@@ -50,7 +50,7 @@ def total_calcs(list_hrs, num_gates, num_cnts_poss):
 		[num_poss_rdr.insert(x,0) for x in missing_hrs]
 		num_cnts_poss = [num_cnts_poss[x] + num_poss_rdr[x] for x in range(24)]
 	end = time.time()
-	# print 'All possible counts calculations took ' + str(end-start) + ' seconds'
+	print 'All possible counts calculations took ' + str(end-start) + ' seconds'
 	return num_cnts_poss
 
 
@@ -66,7 +66,7 @@ def write_to_file(gs_count_n, is_count_n, gs_count_s, is_count_s, num_cnts_poss_
 			north.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day, hr, gs_count_n[hr], is_count_n[hr], num_cnts_poss_n[hr], gs_frac_n, is_frac_n, num_radars_north))
 			south.write('{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n'.format(yr, mth, day, hr, gs_count_s[hr], is_count_s[hr], num_cnts_poss_s[hr], gs_frac_s, is_frac_s, num_radars_south))
 	end_pop = time.time()
-	# print 'Writing took ' + str(end_pop-start_pop) + ' seconds'
+	print 'Writing took ' + str(end_pop-start_pop) + ' seconds'
 
 
 def calc_counts_daily(date):
@@ -92,13 +92,13 @@ def calc_counts_daily(date):
 	good_files = np.where(np.array(fitfiles) != '/data/fitcon/2007/01/20070117.C0.han.fitacf.gz')
 	fitfiles = np.array(fitfiles)[good_files]
 
-	# print 'starting for loop through files'
+	print 'starting for loop through files'
 	start_for = time.time()
 	for file in fitfiles:
-		# print 'The file is:', file
+		print 'The file is:', file
 		start = time.time()
 
-		# print 'trying to open the file'
+		print 'trying to open the file'
 		try:
 			if '.gz' in file:
 				with gzip.open(file, 'r') as f:
@@ -111,7 +111,7 @@ def calc_counts_daily(date):
 			else:
 				records = dm.parse_dmap_format_from_file(file)
 			end = time.time()
-			# print 'Opening file ' + str(file) + ' took ' + str(end-start) + ' seconds'
+			print 'Opening file ' + str(file) + ' took ' + str(end-start) + ' seconds'
 		except EOFError as err:
 			with open('errors_list', 'a') as f:
 				f.write('{}\t{}\n'.format(file, err))
@@ -148,55 +148,55 @@ def calc_counts_daily(date):
 			num_radars_north += 1
 			hrs_1, hrs_2, hrs_3, hrs_4 = [], [], [], []
 
-			# print 'Begin loop through records'
+			print 'Begin loop through records'
 			start = time.time()
 			for i in range(len(records)):
-				gscN_1, iscN_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscN_1, iscN_1)
+				# gscN_1, iscN_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscN_1, iscN_1)
 				gscN_2, iscN_2, hrs_2 = counts_calcs(records, 32, 49, hrs_2, i, gscN_2, iscN_2)
 				gscN_3, iscN_3, hrs_3 = counts_calcs(records, 48, 65, hrs_3, i, gscN_3, iscN_3)
-				gscN_4, iscN_4, hrs_4 = counts_calcs(records, 0, 16, hrs_4, i, gscN_4, iscN_4)
+				# gscN_4, iscN_4, hrs_4 = counts_calcs(records, 0, 16, hrs_4, i, gscN_4, iscN_4)
 			end = time.time()
-			# print 'Total records looping time is ' + str(end-start) + ' seconds'
+			print 'Total records looping time is ' + str(end-start) + ' seconds'
 
 			# Create the list of # records per hour for this radar times the number of gates, this is 
 			# possible counts for this radar per hour
-			ncp_n1 = total_calcs(hrs_1, num_gates, ncp_n1)
+			# ncp_n1 = total_calcs(hrs_1, num_gates, ncp_n1)
 			ncp_n2 = total_calcs(hrs_2, num_gates, ncp_n2)
 			ncp_n3 = total_calcs(hrs_3, num_gates, ncp_n3)
-			ncp_n4 = total_calcs(hrs_4, num_gates, ncp_n4)
+			# ncp_n4 = total_calcs(hrs_4, num_gates, ncp_n4)
 
 		else:
 			num_radars_south += 1
 			hrs_1, hrs_2, hrs_3, hrs_4 = [], [], [], []
 
-			# print 'Begin loop through records'
+			print 'Begin loop through records'
 			start = time.time()
 			for i in range(len(records)):
-				gscS_1, iscS_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscS_1, iscS_1)
+				# gscS_1, iscS_1, hrs_1 = counts_calcs(records, 16, 33, hrs_1, i, gscS_1, iscS_1)
 				gscS_2, iscS_2, hrs_2 = counts_calcs(records, 32, 49, hrs_2, i, gscS_2, iscS_2)
 				gscS_3, iscS_3, hrs_3 = counts_calcs(records, 48, 65, hrs_3, i, gscS_3, iscS_3)
-				gscS_4, iscS_4, hrs_4 = counts_calcs(records, 0, 16, hrs_4, i, gscS_4, iscS_4)
+				# gscS_4, iscS_4, hrs_4 = counts_calcs(records, 0, 16, hrs_4, i, gscS_4, iscS_4)
 			end = time.time()
-			# print 'Total records looping time is ' + str(end-start) + ' seconds'
+			print 'Total records looping time is ' + str(end-start) + ' seconds'
 
-			ncp_s1 = total_calcs(hrs_1, num_gates, ncp_s1)
+			# ncp_s1 = total_calcs(hrs_1, num_gates, ncp_s1)
 			ncp_s2 = total_calcs(hrs_2, num_gates, ncp_s2)
 			ncp_s3 = total_calcs(hrs_3, num_gates, ncp_s3)
-			ncp_s4 = total_calcs(hrs_4, num_gates, ncp_s4)
+			# ncp_s4 = total_calcs(hrs_4, num_gates, ncp_s4)
 
 	end_for = time.time()
-	# print 'Looping through files took ' + str(end_for - start_for) + ' seconds'
-	# print 'Starting file population'
+	print 'Looping through files took ' + str(end_for - start_for) + ' seconds'
+	print 'Starting file population'
 	
-	write_to_file(gscN_1, iscN_1, gscS_1, iscS_1, ncp_n1, ncp_s1, yr, mth, day, num_radars_north, num_radars_south, '16to32')
-	write_to_file(gscN_2, iscN_2, gscS_2, iscS_2, ncp_n2, ncp_s2, yr, mth, day, num_radars_north, num_radars_south, '33to48')
-	write_to_file(gscN_3, iscN_3, gscS_3, iscS_3, ncp_n3, ncp_s3, yr, mth, day, num_radars_north, num_radars_south, '49to64')
-	write_to_file(gscN_4, iscN_4, gscS_4, iscS_4, ncp_n4, ncp_s4, yr, mth, day, num_radars_north, num_radars_south, '0to15')
+	# write_to_file(gscN_1, iscN_1, gscS_1, iscS_1, ncp_n1, ncp_s1, yr, mth, day, num_radars_north, num_radars_south, '16to32')
+	write_to_file(gscN_2, iscN_2, gscS_2, iscS_2, ncp_n2, ncp_s2, yr, mth, day, num_radars_north, num_radars_south, 't33to48')
+	write_to_file(gscN_3, iscN_3, gscS_3, iscS_3, ncp_n3, ncp_s3, yr, mth, day, num_radars_north, num_radars_south, 't49to64')
+	# write_to_file(gscN_4, iscN_4, gscS_4, iscS_4, ncp_n4, ncp_s4, yr, mth, day, num_radars_north, num_radars_south, '0to15')
 
 if __name__ == '__main__':
 	date = sys.argv[1]
-	# print 'Starting calculations for this day'
+	print 'Starting calculations for this day'
 	start_day = time.time()
 	calc_counts_daily(date)	
 	end_day = time.time()		
-	# print 'Done! This day took ' + str(end_day-start_day) + ' seconds'
+	print 'Done! This day took ' + str(end_day-start_day) + ' seconds'
